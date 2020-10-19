@@ -1,7 +1,7 @@
 /// This enumeration describes the 16 possible VGA Text Colors
 /// Each Color is represented by 4 bits, such that the text color
 /// including foreground and background can be made into 1 byte
-/// This means that a character displayed to the screen is in the 
+/// This means that a character displayed to the screen is in the
 /// format |fg|bg|char| within a 16 bit integer (1 byte color, 1 char)
 pub const VGAColor = enum(u4) {
     Black = 0, Blue = 1, Green = 2, Cyan = 3, Red = 4, Magenta = 5, Brown = 6, LightGray = 7, DarkGray = 8, LightBlue = 9, LightGreen = 10, LightCyan = 11, LightRed = 12, Pink = 13, Yellow = 14, White = 15
@@ -35,6 +35,21 @@ pub fn setFGColor(nfg: VGAColor) void {
 /// This function sets the internal background color to a new VGA color.
 pub fn setBGColor(nbg: VGAColor) void {
     ibg = nbg;
+}
+
+//Need x86 for the next two methods
+const x86 = @import("x86.zig");
+
+/// Disables the cursor
+pub fn disableCursor() void {
+    x86.writeByte(0x3D4, 0x0A);
+    x86.writeByte(0x3D5, 0x20);
+}
+
+/// Enables the cursor
+pub fn enableCursor() void {
+    x86.writeByte(0x3D4, 0x0A);
+    x86.writeByte(0x3D5, 0x00);
 }
 
 /// This function creates a VGA text buffer entry with the correct color
@@ -97,16 +112,16 @@ pub fn puts(cx: u8, cy: u8, cfg: VGAColor, cbg: VGAColor, string: []const u8) vo
 /// characters in addition. The print command behaves identically otherwise.
 pub fn print(string: []const u8) void {
     var i: usize = 0;
-    while(i < string.len) : (i += 1) {
+    while (i < string.len) : (i += 1) {
 
         //Look for special characters.
 
         //Is a new line
-        if(string[i] == '\n'){
+        if (string[i] == '\n') {
             tx = 0;
             ty += 1;
             //We must also check that we hit the end of the buffer
-            if(ty == ScrHeight) {
+            if (ty == ScrHeight) {
                 clear();
                 tx = 0;
                 ty = 0;
@@ -116,17 +131,17 @@ pub fn print(string: []const u8) void {
         }
 
         //Is a tab
-        if(string[i] == '\t'){
+        if (string[i] == '\t') {
             //Add spaces until it evenly divides by 4.
             var currentAlign = tx / 4;
-            while(tx / 4 == currentAlign) : (tx += 1){}
+            while (tx / 4 == currentAlign) : (tx += 1) {}
 
-            if(tx == ScrWidth){
+            if (tx == ScrWidth) {
                 tx = 0;
                 ty += 1;
             }
 
-            if(ty == ScrHeight) {
+            if (ty == ScrHeight) {
                 clear();
                 tx = 0;
                 ty = 0;
@@ -139,13 +154,13 @@ pub fn print(string: []const u8) void {
         putChar(tx, ty, ifg, ibg, string[i]);
 
         //Checks if we hit the end of the columns
-        if(tx == ScrWidth){
+        if (tx == ScrWidth) {
             tx = 0;
             ty += 1;
         }
 
         //Checks if we hit the end of the buffer
-        if(ty == ScrHeight) {
+        if (ty == ScrHeight) {
             clear();
             tx = 0;
             ty = 0;
