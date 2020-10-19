@@ -4,13 +4,12 @@ test "" {
 }
 
 //The VGA Driver
-pub const vga = @import("driver/vga.zig");
-pub const sio = @import("driver/serial.zig");
+pub const io = @import("driver/io.zig");
 pub const x86 = @import("driver/x86.zig");
 
 /// A simple method that simply hangs the CPU
 fn kCrash() noreturn {
-    vga.println("KERNEL HAS CRASHED!");
+    io.println("KERNEL HAS CRASHED!");
     x86.hang();
     while (true) {}
 }
@@ -24,12 +23,12 @@ const MBMAGIC = 0x36d76289;
 /// If it is not, the kernel crashes.
 fn validateMultiboot(magic: u32) void {
     if (magic != MBMAGIC) {
-        vga.setFGColor(vga.VGAColor.Red);
-        vga.println("ERROR: Kernel must be loaded with MultiBoot2.");
-        vga.println("Failed to boot.");
+        io.vga.setFGColor(io.vga.Color.Red);
+        io.println("ERROR: Kernel must be loaded with MultiBoot2.");
+        io.println("Failed to boot.");
         kCrash();
     } else {
-        vga.println("Found Valid MultiBoot2 Header!");
+        io.println("Found Valid MultiBoot2 Header!");
     }
 }
 
@@ -37,17 +36,11 @@ fn validateMultiboot(magic: u32) void {
 /// Here, we are in charge of setting up the system for our needs.
 /// Errors here will result in direct crashes with error messages.
 export fn kInit(magic: u32, mboot_hdr: ?*c_void) void {
+    io.init();
 
-    sio.init();
-    sio.println("Hello there.");
-    sio.println("Hello there.");
-
-    
-    vga.disableCursor();
-    
+    io.putChar('q');
     //Print a very basic message
-    vga.setFGColor(vga.VGAColor.Yellow);
-    vga.println("Loaded into kernel boiler-plate...");
+    io.println("Loaded into kernel boiler-plate...");
 
     //Validate the Multiboot header
     validateMultiboot(magic);

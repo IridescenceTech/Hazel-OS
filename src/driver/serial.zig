@@ -51,6 +51,6 @@ pub fn print(string: []const u8) void {
 }
 
 /// The print line function appends a newline to the end of the string.
-pub fn println(comptime string: []const u8) void{
+pub inline fn println(comptime string: []const u8) void{
     print(string ++ "\n");
 }
