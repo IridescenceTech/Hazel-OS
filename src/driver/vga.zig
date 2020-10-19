@@ -3,7 +3,7 @@
 /// including foreground and background can be made into 1 byte
 /// This means that a character displayed to the screen is in the
 /// format |fg|bg|char| within a 16 bit integer (1 byte color, 1 char)
-pub const Color = enum(u4) {
+pub const Color = enum(u8) {
     Black = 0, Blue = 1, Green = 2, Cyan = 3, Red = 4, Magenta = 5, Brown = 6, LightGray = 7, DarkGray = 8, LightBlue = 9, LightGreen = 10, LightCyan = 11, LightRed = 12, Pink = 13, Yellow = 14, White = 15
 };
 
@@ -31,6 +31,12 @@ var text_buffer = @intToPtr([*]volatile u16, 0xb8000);
 pub fn init() void {
     disableCursor();
     clear();
+}
+
+/// This function sets the X and Y of the terminal position.
+pub fn setPosXY(x: u32, y: u32) void {
+    tx = x;
+    ty = y;
 }
 
 /// This function sets the internal foreground color to a new VGA color.
@@ -62,7 +68,8 @@ pub fn enableCursor() void {
 /// and character. The two VGA colors become a single byte with |fg|bg|
 /// which prefixes the character in the Least Significant Byte.
 fn makeVGACode(fg: Color, bg: Color, char: u8) u16 {
-    return @intCast(u16, @enumToInt(bg)) << 4 | @intCast(u16, @enumToInt(fg)) << 8 | char;
+    var col: u16 = @enumToInt(fg) | @enumToInt(bg) << 4;
+    return col << 8 | char;
 }
 
 /// The clear function starts at 0 and iterates through all 80x25 columns
@@ -73,7 +80,7 @@ pub fn clear() void {
     while (x < ScrWidth) : (x += 1) {
         var y: usize = 0;
         while (y < ScrHeight) : (y += 1) {
-            text_buffer[y * ScrWidth + x] = 0;
+            text_buffer[y * ScrWidth + x] = makeVGACode(ifg, ibg, ' ');
         }
     }
 }
