@@ -60,9 +60,10 @@ pub inline fn sti() void {
 }
 
 /// Hang the computer
-pub inline fn hang() void {
+pub inline fn hang() noreturn {
     asm volatile (
         \\cli
         \\hlt
     );
+    while(true){}
 }

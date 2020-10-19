@@ -8,7 +8,7 @@ pub const sio = @import("serial.zig");
 
 /// Initializes Serial I/O and sets up defaults for the VGA driver
 pub inline fn init() void {
-    vga.disableCursor();
+    vga.init();
     vga.setFGColor(vga.Color.Yellow);
     sio.init();
 }
@@ -26,7 +26,7 @@ pub inline fn print(string: []const u8) void {
 }
 
 /// Prints a string with a newline to both I/O interfaces
-pub inline fn println(comptime string: []const u8) void {
+pub inline fn println(string: []const u8) void {
     vga.println(string);
     sio.println(string);
 }

@@ -10,9 +10,10 @@ _kstart: ;Entrypoint
 	mov esp, stack_top ;Give ourselves a 16KiB stack
 
 	push ebx	; Push the multiboot header address
-	push eax	; Push the multiboot magic number
+	push 10	; Push the multiboot magic number
 	call kInit	; Call kernel initialization
 
+	cli
 	hlt	;Halt if we get here
 
 
