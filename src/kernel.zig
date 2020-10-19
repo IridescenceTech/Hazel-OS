@@ -1,21 +1,44 @@
+//Validate the kernel with refAllDecls
+test "" {@import("std").testing.refAllDecls(@This());}
+
+//The VGA Driver
 pub const vga = @import("vga.zig");
 
+/// This is the multiboot magic number to verify
+//TODO: Make a multiboot.zig
 const MBMAGIC = 0x36d76289;
 
-extern fn kCrash() void;
+/// kCrash() is a silent method that simply hangs the CPU
+fn kCrash() noreturn {
+    asm volatile(
+        \\cli
+        \\hlt
+    );
+    while(true){}
+}
 
-export fn kInit(mboot_mag: u32, mboot_hdr: ?*c_void) void {
-    //Fill this out
-    vga.init();
-    vga.puts(0, 0, vga.VGAColor.Yellow, vga.VGAColor.Black, "Loaded into kernel boiler-plate...");
-
-    if (mboot_mag != MBMAGIC) {
-        vga.puts(0, 1, vga.VGAColor.LightRed, vga.VGAColor.Black, "ERROR: Kernel must be loaded with MultiBoot2.");
-        vga.puts(0, 2, vga.VGAColor.LightRed, vga.VGAColor.Black, "Failed to boot.");
+fn validateMultiboot(magic: u32) void {
+    if (magic != MBMAGIC) {
+        vga.setFGColor(vga.VGAColor.Red);
+        vga.println("ERROR: Kernel must be loaded with MultiBoot2.");
+        vga.println("Failed to boot.");
         kCrash();
     } else {
-        vga.puts(0, 1, vga.VGAColor.LightGreen, vga.VGAColor.Black, "Found Valid MultiBoot2 Header!");
+        vga.println("Found Valid MultiBoot2 Header!");
     }
+}
 
-    //Otherwise initialize the rest of the system
+/// This is the main boilerplate for kernel execution
+/// Here, we are in charge of setting up the system for our needs.
+/// Errors here will result in direct crashes with error messages.
+export fn kInit(magic: u32, mboot_hdr: ?*c_void) void {
+    
+    //Print a very basic message
+    vga.setFGColor(vga.VGAColor.Yellow);
+    vga.println("Loaded into kernel boiler-plate...");
+
+    //Validate the Multiboot header
+    validateMultiboot(magic);
+    
+    
 }

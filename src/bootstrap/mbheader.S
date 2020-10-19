@@ -1,4 +1,4 @@
-section .mboot_header
+section .mboot_header ; Custom section for the multiboot header
 header_start:
 	dd 0xe85250d6	; Magic
 	dd 0		; Arch

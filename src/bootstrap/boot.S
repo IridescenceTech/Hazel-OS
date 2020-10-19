@@ -1,26 +1,22 @@
-global _kstart
-global kCrash
+global _kstart ; This is the program entrypoint
 
 section .text
-bits 32
+bits 32 ;For now, we are in 32 bit mode.
 
-extern kInit
+extern kInit ;This function is our Zig Kernel entrypoint
 
-_kstart:
-	cli
-	mov esp, stack_top
+_kstart: ;Entrypoint
+	cli	;Clear interrupts
+	mov esp, stack_top ;Give ourselves a 16KiB stack
 
-	push ebx	
-	push eax
-	call kInit
+	push ebx	; Push the multiboot header address
+	push eax	; Push the multiboot magic number
+	call kInit	; Call kernel initialization
 
-	hlt
+	hlt	;Halt if we get here
 
-kCrash:
-	cli
-	hlt
 
 section .bss
-stack_bot:
+stack_bot: ;Set up our 16KiB stack
 	resb 16384
 stack_top:

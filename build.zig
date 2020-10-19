@@ -18,10 +18,13 @@ pub fn build(b: *Builder) void {
     exe.setBuildMode(builtin.Mode.ReleaseSmall);
     exe.setOutputDir("./obj/");
 
+    const tests = b.addTest("src/kernel.zig");
+    tests.step.dependOn(&exe.step);
+
     const bootstrap = b.addSystemCommand(&[_][]const u8{
         "nasm", "src/bootstrap/boot.S", "-f", "elf32", "-o", "obj/boot.o",
     });
-    bootstrap.step.dependOn(&exe.step);
+    bootstrap.step.dependOn(&tests.step);
 
     const mbHeader = b.addSystemCommand(&[_][]const u8{
         "nasm", "src/bootstrap/mbheader.S", "-f", "elf32", "-o", "obj/head.o",
