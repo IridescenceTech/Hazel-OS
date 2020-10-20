@@ -3,6 +3,10 @@ const x86 = @import("driver/x86.zig");
 
 const builtin = @import("builtin");
 
+export fn errorCB(code: u32) void {
+    x86.hang();
+}
+
 pub fn drawBSOD(panicMessage: []const u8, addrMessage: []const u8) void {
     io.vga.setBGColor(io.vga.Color.Blue);
     io.vga.setFGColor(io.vga.Color.White);

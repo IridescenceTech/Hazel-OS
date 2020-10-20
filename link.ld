@@ -10,12 +10,16 @@ SECTIONS {
 	
 	/* Aligned blocks for code */
 	.text BLOCK(4K) : ALIGN(4K) {
+		__TEXT_START = .;
 		*(.text)
+		__TEXT_END = .;
 	}
 
 	/* Aligned blocks for data */
 	.data BLOCK(4K) : ALIGN (4K) {
+		__DATA_START = .;
 		*(.text)
+		__DATA_END = .;
 	}
 
 	/* Aligned blocks for stack */
@@ -24,5 +28,5 @@ SECTIONS {
 	}
 
 	. = ALIGN(4K);
-	end = .;
+	__KERNEL_END = .;
 }
