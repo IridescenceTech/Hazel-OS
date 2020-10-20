@@ -14,7 +14,7 @@ pub fn build(b: *Builder) void {
 
     const exe = b.addObject("kernel", "src/kernel.zig");
     exe.setTarget(target);
-    exe.setBuildMode(builtin.Mode.ReleaseFast);
+    exe.setBuildMode(builtin.Mode.ReleaseSafe);
     //exe.strip = true;
     exe.setOutputDir("./obj/");
 

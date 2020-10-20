@@ -1,3 +1,5 @@
+/// These are generic functions that we may require from @memset, @memcpy, @memcmp
+
 export fn memset(ptr: [*]u8, value: u32, num: usize) [*]u8{
     var i : usize = 0;
     while (i < num) : (i += 1) {

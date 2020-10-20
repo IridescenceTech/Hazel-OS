@@ -3,10 +3,9 @@ const x86 = @import("driver/x86.zig");
 
 const builtin = @import("builtin");
 
-export fn errorCB(code: u32) void {
-    x86.hang();
-}
 
+/// Draws a Blue-Screen-Of-Death (BSOD) message. This should be replaced.
+//TODO: Make a real kPanic screen
 pub fn drawBSOD(panicMessage: []const u8, addrMessage: []const u8) void {
     io.vga.setBGColor(io.vga.Color.Blue);
     io.vga.setFGColor(io.vga.Color.White);
@@ -21,6 +20,7 @@ pub fn drawBSOD(panicMessage: []const u8, addrMessage: []const u8) void {
     io.println("Check with your hardware vendor for any BIOS updates. Disable BIOS memory\noptions such as caching or shadowing. If you need to use Safe Mode to remove or disable components, restart your computer, press F8 to select Advanced Startup\nOptions, and then select Safe Mode.\n\n");
     io.println("Technical information: \n");
     io.print("Kernel Panic: ");
+    
     //Give the panic message
     io.println(panicMessage);
     io.println(addrMessage);
@@ -35,18 +35,6 @@ pub fn drawBSOD(panicMessage: []const u8, addrMessage: []const u8) void {
 /// at which the kernel has panicked.
 pub fn panic(message: []const u8, stack_trace: ?*builtin.StackTrace) noreturn {
     @setCold(true);
-    @setRuntimeSafety(false);
-    
-    const std = @import("std");
-    var it = std.debug.StackIterator.init(@returnAddress(), @frameAddress());
-    while (it.next()) |return_address| {
-        if (return_address == 0) break;
-        var buf : [64]u8 = undefined;
-        std.mem.set(u8, buf[0..], 0);
-
-        var str = std.fmt.bufPrint(buf[0..], "Found error at: 0x{x}\n\n", .{return_address-4}) catch unreachable;
-        drawBSOD(message, str);
-        break;
-    }
+    drawBSOD(message, "Can I get an F in the chat?");
     x86.hang();
 }

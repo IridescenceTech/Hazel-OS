@@ -10,6 +10,7 @@ hang:
 	cli
 	hlt	;Halt if we get here
 
+; This code is from https://os.phil-opp.com
 check_multiboot:
 	cmp eax, 0x36d76289
 	jne .no_multiboot

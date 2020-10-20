@@ -6,7 +6,6 @@ test "" {
 const io = @import("driver/io.zig");
 const x86 = @import("driver/x86.zig");
 pub const panic = @import("panic.zig").panic;
-usingnamespace @import("multiboot.zig");
 usingnamespace @import("mem.zig");
 
 /// This is the main boilerplate for kernel execution
@@ -16,5 +15,7 @@ export fn kInit(mboot_hdr: ?*c_void) void {
     io.init();
 
     //Print a very basic message
-    io.println("Loaded into kernel boiler-plate...");
+    io.println("Loaded into 64-bit kernel initializer!");
+
+
 }
